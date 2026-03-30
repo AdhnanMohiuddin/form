@@ -12,7 +12,7 @@ const Navbar = ({ toggleSidebar }) => {
         >
           <Menu size={22} className="text-gray-600" />
         </button>
-        <img src={logo} alt="Single View" className="h-10 w-auto object-contain" />
+        <img src={logo} alt="Single View" className="h-16 w-auto object-contain" />
       </div>
 
       <div className="flex items-center gap-5">
@@ -36,10 +36,10 @@ const Navbar = ({ toggleSidebar }) => {
         {/* User Avatar */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-semibold">
-            IE
+            UN
           </div>
           <span className="text-sm text-gray-700 max-w-[100px] truncate">
-            Ismail_Exe...
+            User Name
           </span>
         </div>
       </div>
