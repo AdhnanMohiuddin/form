@@ -1,32 +1,33 @@
 import { Formik, Form } from "formik";
 import { useState } from "react";
 import { initialValues } from "../constants/initialValues";
-import { applicantDeliverySchema } from "../validation/applicantDelivery.schema";
 import { bankGuaranteeSchema } from "../validation/bankGuarantee.schema";
+import { applicantDeliverySchema } from "../validation/applicantDelivery.schema";
 import { beneficiaryLiabilitySchema } from "../validation/beneficiaryLiability.schema";
 import { totalOrderAmountSchema } from "../validation/totalOrderAmount.schema";
+import { STEPS, TOTAL_STEPS } from "../constants/steps";
 import BankGuarantee from "../sections/BankGuarantee";
 import ApplicantDelivery from "../sections/ApplicantDelivery";
-import BeneficiaryLiability from "../sections/BenificiaryLiablity";
+import BeneficiaryLiability from "../sections/BeneficiaryLiability";
 import TotalOrderAmount from "../sections/TotalOrderAmount";
 
-export default function BankingForm() {
-  const [currentStep, setCurrentStep] = useState(0);
+const validationSchemas = [
+  bankGuaranteeSchema,
+  applicantDeliverySchema,
+  beneficiaryLiabilitySchema,
+  totalOrderAmountSchema,
+];
 
-  const validationSchemas = [
-    bankGuaranteeSchema,
-    applicantDeliverySchema,
-    beneficiaryLiabilitySchema,
-    totalOrderAmountSchema,
-  ];
-  const isLastStep = currentStep === 3;
+export default function BankingForm() {
+  const [currentStep, setCurrentStep] = useState(STEPS.BANK_GUARANTEE);
+  const isLastStep = currentStep === TOTAL_STEPS - 1;
 
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchemas[currentStep]}
-      validateOnBlur={false}
-      validateOnChange={false}
+      validateOnBlur={true}
+      validateOnChange={true}
       onSubmit={(values) => {
         if (!isLastStep) {
           setCurrentStep((prev) => prev + 1);
@@ -37,35 +38,11 @@ export default function BankingForm() {
       }}
     >
       {(formik) => (
-        
-        <Form className="p-6 space-y-4 max-w-6xl w-full mx-auto">
-
-          <BankGuarantee
-            formik={formik}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-          />
-
-          <ApplicantDelivery
-            formik={formik}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-          />
-
-          <BeneficiaryLiability
-          formik={formik}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-          />
-            
-          <TotalOrderAmount
-            formik={formik}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-          />
-            <h3 className="text-sm font-medium" >Testing</h3>
-            <pre>{JSON.stringify(formik.errors, null, 2)}</pre>
-             <div>Current Step: {currentStep}</div>
+        <Form className="space-y-4 max-w-6xl w-full mx-auto">
+          <BankGuarantee formik={formik} currentStep={currentStep} setCurrentStep={setCurrentStep} />
+          <ApplicantDelivery formik={formik} currentStep={currentStep} setCurrentStep={setCurrentStep} />
+          <BeneficiaryLiability formik={formik} currentStep={currentStep} setCurrentStep={setCurrentStep} />
+          <TotalOrderAmount formik={formik} currentStep={currentStep} setCurrentStep={setCurrentStep} />
         </Form>
       )}
     </Formik>

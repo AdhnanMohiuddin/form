@@ -1,47 +1,68 @@
-import { Field, ErrorMessage } from "formik";
-import { Check } from "lucide-react";
-import { formConfig } from "../constants/formConfig"; // for currency
+import { useEffect } from "react";
+import { formConfig } from "../constants/formConfig";
+import { STEPS } from "../constants/steps";
+import { initialValues } from "../constants/initialValues";
+import FormField from "../components/FormField";
+import StepHeader from "../components/StepHeader";
+import StepButtons from "../components/StepButtons";
+
+const STEP = STEPS.TOTAL_ORDER_AMOUNT;
+const SECTION_KEY = "TotalOrderAmountDetails";
 
 export default function TotalOrderAmount({ formik, currentStep, setCurrentStep }) {
-  const isCompleted = currentStep > 3;
-  const values = formik.values.TotalOrderAmountDetails;
+  const values = formik.values[SECTION_KEY];
+
+  // Auto-calculate VAT amount, total, and final payable
+  const { contract_amount, vat_percentage, advance_payment_amount } = values;
+  useEffect(() => {
+    const contract = parseFloat(contract_amount) || 0;
+    const vatPct = parseFloat(vat_percentage) || 0;
+    const advance = parseFloat(advance_payment_amount) || 0;
+
+    const vatAmount = contract * (vatPct / 100);
+    const totalIncVat = contract + vatAmount;
+    const finalPayable = totalIncVat - advance;
+
+    formik.setFieldValue(`${SECTION_KEY}.vat_amount`, vatAmount ? vatAmount.toFixed(2) : "");
+    formik.setFieldValue(`${SECTION_KEY}.total_amount_including_vat`, totalIncVat ? totalIncVat.toFixed(2) : "");
+    formik.setFieldValue(`${SECTION_KEY}.final_payable_amount`, totalIncVat ? finalPayable.toFixed(2) : "");
+  }, [contract_amount, vat_percentage, advance_payment_amount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleClear = () => {
+    formik.setFieldValue(SECTION_KEY, { ...initialValues[SECTION_KEY] });
+    formik.setErrors({});
+    formik.setTouched({});
+  };
+
+  const handleNext = async () => {
+    const errors = await formik.validateForm();
+    formik.setTouched({
+      [SECTION_KEY]: Object.fromEntries(
+        Object.keys(formik.values[SECTION_KEY]).map((k) => [k, true])
+      ),
+    });
+
+    if (!errors[SECTION_KEY] || Object.keys(errors[SECTION_KEY]).length === 0) {
+      formik.handleSubmit();
+    } else {
+      setTimeout(() => {
+        const el = document.querySelector(".text-red-500");
+        if (el?.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 45);
+    }
+  };
 
   return (
-    <div className="max-w-full mx-auto border rounded-xl bg-white shadow-sm mb-6">
+    <div className="max-w-full mx-auto border border-gray-200 rounded-xl bg-white shadow-sm">
+      <StepHeader
+        stepIndex={STEP}
+        currentStep={currentStep}
+        title="Total Order Amount details"
+        onEdit={setCurrentStep}
+      />
 
-      {/* HEADER */}
-      <div className={`flex justify-between items-center p-4 ${currentStep === 3 ? 'border-b' : ''}`}>
-        <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 flex items-center justify-center rounded-full 
-            ${isCompleted ? "bg-green-500 text-white" : "bg-gray-200"}`}>
-            {isCompleted ? <Check className="text-white w-5 h-5 stroke-[4]" /> : "4"}
-          </div>
-          <h2 className="font-semibold text-lg">Total Order Amount</h2>
-        </div>
-
-        {isCompleted && (
-          <button
-            type="button"
-            onClick={() => setCurrentStep(3)}
-            className="text-blue-600 text-sm"
-          >
-            Edit
-          </button>
-        )}
-      </div>
-
-      {/* ACTIVE FORM */}
-      {currentStep === 3 && (
-        <div className="p-6 space-y-6 pr-25"
-          onFocus={(e) => {
-            const name = e.target.name;
-            if (name) {
-              formik.setFieldError(name, undefined);
-              formik.setFieldTouched(name, false);
-            }
-          }}
-        >
-
+      {currentStep === STEP && (
+        <div className="px-6 py-6 pr-40 space-y-6">
           <div className="grid grid-cols-3 gap-x-10 gap-y-6 items-start">
             <div>
               <h3 className="font-semibold text-gray-700">Total Order Amount</h3>
@@ -49,133 +70,24 @@ export default function TotalOrderAmount({ formik, currentStep, setCurrentStep }
             </div>
 
             <div className="space-y-4 col-span-2">
-              <Field
-                type="number"
-                name="TotalOrderAmountDetails.contract_amount"
-                placeholder="Contract Amount"
-                className="border p-2 w-full rounded"
-              />
-              <ErrorMessage name="TotalOrderAmountDetails.contract_amount" component="div" className="text-red-500 text-sm mt-1" />
-
-              <Field
-                type="number"
-                name="TotalOrderAmountDetails.vat_percentage"
-                placeholder="VAT %"
-                className="border p-2 w-full rounded"
-              />
-              <ErrorMessage name="TotalOrderAmountDetails.vat_percentage" component="div" className="text-red-500 text-sm mt-1" />
-
-              <Field
-                type="number"
-                name="TotalOrderAmountDetails.vat_amount"
-                placeholder="VAT Amount"
-                className="border p-2 w-full rounded"
-              />
-              <ErrorMessage name="TotalOrderAmountDetails.vat_amount" component="div" className="text-red-500 text-sm mt-1" />
-
-              <Field
-                type="number"
-                name="TotalOrderAmountDetails.total_amount_including_vat"
-                placeholder="Total Amount (Including VAT)"
-                className="border p-2 w-full rounded"
-              />
-              <ErrorMessage name="TotalOrderAmountDetails.total_amount_including_vat" component="div" className="text-red-500 text-sm mt-1" />
-
-              <Field
-                type="number"
-                name="TotalOrderAmountDetails.advance_payment_amount"
-                placeholder="Advance Payment Amount"
-                className="border p-2 w-full rounded"
-              />
-              <ErrorMessage name="TotalOrderAmountDetails.advance_payment_amount" component="div" className="text-red-500 text-sm mt-1" />
-
-              <Field
-                type="number"
-                name="TotalOrderAmountDetails.final_payable_amount"
-                placeholder="Final Payable Amount"
-                className="border p-2 w-full rounded"
-              />
-              <ErrorMessage name="TotalOrderAmountDetails.final_payable_amount" component="div" className="text-red-500 text-sm mt-1" />
-
-              <Field
+              <FormField name={`${SECTION_KEY}.contract_amount`} type="number" placeholder="Contract Amount" />
+              <FormField name={`${SECTION_KEY}.vat_percentage`} type="number" placeholder="VAT %" />
+              <FormField name={`${SECTION_KEY}.vat_amount`} type="number" placeholder="VAT Amount" readOnly />
+              <FormField name={`${SECTION_KEY}.total_amount_including_vat`} type="number" placeholder="Total Amount (Including VAT)" readOnly />
+              <FormField name={`${SECTION_KEY}.advance_payment_amount`} type="number" placeholder="Advance Payment Amount" />
+              <FormField name={`${SECTION_KEY}.final_payable_amount`} type="number" placeholder="Final Payable Amount" readOnly />
+              <FormField
+                name={`${SECTION_KEY}.currency`}
                 as="select"
-                name="TotalOrderAmountDetails.currency"
-                className="border p-2 w-full rounded"
-              >
-                <option value="">Select Currency</option>
-                {formConfig.currency_options.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </Field>
-              <ErrorMessage name="TotalOrderAmountDetails.currency" component="div" className="text-red-500 text-sm mt-1" />
+                placeholder="Select Currency"
+                options={formConfig.currency_options}
+              />
             </div>
           </div>
 
-          {/* BUTTONS */}
-          <div className="flex justify-between pt-4 border-t">
-            <button
-              type="button"
-              onClick={() =>{
-                formik.setFieldValue("TotalOrderAmountDetails", {
-                  contract_amount: "",
-                  vat_percentage: "",
-                  vat_amount: "",
-                  total_amount_including_vat: "",
-                  advance_payment_amount: "",
-                  final_payable_amount: "",
-                  currency: ""
-                });
-                formik.setTouched({ TotalOrderAmountDetails: Object.fromEntries(
-                  Object.keys(formik.values.TotalOrderAmountDetails).map(k => [k, false])
-                )});
-              }}
-              className="border px-4 py-2 rounded"
-            >
-              Clear
-            </button>
-
-            <button
-              type="button"
-              onClick={async () => {
-                const errors = await formik.validateForm();
-                formik.setTouched({ TotalOrderAmountDetails: Object.fromEntries(
-                  Object.keys(formik.values.TotalOrderAmountDetails).map(k => [k, true])
-                )});
-
-                if (!errors.TotalOrderAmountDetails || Object.keys(errors.TotalOrderAmountDetails).length === 0) {
-                  if (currentStep < 3) {
-                    setCurrentStep(currentStep + 1);
-                  } else {
-                    formik.handleSubmit();
-                  }
-                } else {
-                  setTimeout(() => {
-                    const firstErrorEl = document.querySelector('.text-red-500');
-                    if (firstErrorEl?.scrollIntoView) firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }, 45);
-                }
-              }}
-              className="bg-orange-500 text-white px-6 py-2 rounded"
-            >
-              Next
-            </button>
-          </div>
+          <StepButtons onClear={handleClear} onNext={handleNext} nextLabel="Submit" />
         </div>
       )}
-
-      {/* COMPLETED VIEW 
-      {isCompleted && (
-        <div className="p-4 text-sm text-gray-600">
-          <p><strong>Contract Amount:</strong> {values.contract_amount}</p>
-          <p><strong>VAT %:</strong> {values.vat_percentage}</p>
-          <p><strong>VAT Amount:</strong> {values.vat_amount}</p>
-          <p><strong>Total Amount:</strong> {values.total_amount_including_vat}</p>
-          <p><strong>Advance Payment:</strong> {values.advance_payment_amount}</p>
-          <p><strong>Final Payable:</strong> {values.final_payable_amount}</p>
-          <p><strong>Currency:</strong> {values.currency}</p>
-        </div>
-      )}
-      */}
     </div>
   );
 }

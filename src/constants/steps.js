@@ -1,0 +1,8 @@
+export const STEPS = {
+  BANK_GUARANTEE: 0,
+  APPLICANT_DELIVERY: 1,
+  BENEFICIARY_LIABILITY: 2,
+  TOTAL_ORDER_AMOUNT: 3,
+};
+
+export const TOTAL_STEPS = 4;

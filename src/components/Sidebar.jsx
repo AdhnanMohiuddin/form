@@ -1,92 +1,91 @@
 import { useState } from "react";
-import { Home, Repeat, Grid, Settings, Menu } from "lucide-react";
+import { Home, Repeat, Grid, Settings } from "lucide-react";
+
+const mainIcons = [
+  { id: "home", icon: Home, label: "Home" },
+  { id: "arrows", icon: Repeat, label: "Open Banking Services" },
+  { id: "grid", icon: Grid, label: "Letter of Guarantee" },
+  { id: "settings", icon: Settings, label: "Settings" },
+];
 
 export default function SidebarWithPanels() {
-  const [activePanel, setActivePanel] = useState(null); // 'home', 'arrows', 'grid', 'settings'
-  const [sidebarOpen, setSidebarOpen] = useState(true); // for collapsing sidebar
-
-  const mainIcons = [
-    { id: "home", icon: Home, label: "Home" },
-    { id: "arrows", icon: Repeat, label: "Open Banking Services" },
-    { id: "grid", icon: Grid, label: "Letter of Guarantee" },
-    { id: "settings", icon: Settings, label: "Settings" },
-  ];
+  const [activePanel, setActivePanel] = useState("grid");
 
   return (
     <div className="flex min-h-full">
-      {/* Collapsible Sidebar */}
-      {sidebarOpen && (
-        <div className="flex flex-col items-center w-16 bg-white border-r shadow-md py-4 space-y-6 min-h-full">
-          {mainIcons.map(({ id, icon: Icon, label }) => {
-            const isActive = activePanel === id;
-            return (
-              <button
-                key={id}
-                onClick={() => setActivePanel(isActive ? null : id)}
-                className={`flex items-center justify-center w-12 h-12 rounded-md transition-colors
-                  ${isActive ? "bg-orange-400 text-white" : "text-gray-600 hover:bg-gray-200"}`}
-                title={label}
-                aria-label={label}
-              >
-                <Icon size={24} />
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* Icon Bar */}
+      <div className="flex flex-col items-center w-16 bg-white border-r py-4 space-y-4 min-h-full">
+        {mainIcons.map(({ id, icon: Icon, label }) => { // eslint-disable-line no-unused-vars
+          const isActive = activePanel === id;
+          return (
+            <button
+              key={id}
+              onClick={() => setActivePanel(isActive ? null : id)}
+              className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors
+                ${isActive ? "bg-orange-400 text-white" : "text-gray-500 hover:bg-gray-100"}`}
+              title={label}
+              aria-label={label}
+            >
+              <Icon size={20} />
+            </button>
+          );
+        })}
+      </div>
 
-      {/* Secondary Sidebar (panel) */}
-      {activePanel && sidebarOpen && (
-        <div className="w-64 bg-gray-50 border-r p-4 flex flex-col min-h-full">
-          {/* Header */}
-          <div className="mb-4 font-semibold text-lg border-b pb-2">
-            {activePanel === "home" && "Home Page"}
-            {activePanel === "arrows" && "Arrows icon"}
+      {/* Secondary Panel */}
+      {activePanel && (
+        <div className="w-56 bg-white border-r px-3 py-4 flex flex-col min-h-full">
+          <div className="mb-3 font-bold text-xs tracking-wide text-blue-700 uppercase px-2">
+            {activePanel === "home" && "Home"}
+            {activePanel === "arrows" && "Open Banking Services"}
             {activePanel === "grid" && "OPEN BANKING SERVICES"}
             {activePanel === "settings" && "Settings"}
           </div>
 
-          {/* Content */}
-          <div className="flex flex-col space-y-2 text-gray-700 flex-1 overflow-auto">
-            {activePanel === "home" && <p>Welcome to the Home page panel.</p>}
+          <div className="flex flex-col text-gray-700 flex-1 overflow-auto text-sm">
+            {activePanel === "home" && <p className="px-2 text-gray-500">Welcome to the Home page.</p>}
 
             {activePanel === "grid" && (
-  <>
+              <>
+                <SidebarItem label="E-Statements" />
+                <SidebarItem label="Credit check" />
 
-    <button className="flex justify-between text-left hover:underline">
-      E-Statements <span className="bg-gray-200 text-gray-700 px-2 rounded-full text-xs">19</span>
-    </button>
-    <button className="flex justify-between text-left hover:underline">
-      Credit Check <span className="bg-gray-200 text-gray-700 px-2 rounded-full text-xs">10</span>
-    </button>
+                <p className="font-semibold text-xs text-orange-500 mt-4 mb-1 px-2 uppercase tracking-wide">
+                  Letter of Guarantee
+                </p>
 
-    <p className="font-semibold text-sm text-orange-600 mt-4">
-      LETTER OF GUARANTEE
-    </p>
-    <button className="flex justify-between text-left hover:underline">
-      Request New Guarantee <span className="bg-gray-200 text-gray-700 px-2 rounded-full text-xs">14</span>
-    </button>
-    <button className="flex justify-between text-left hover:underline">
-      Active Guarantees <span className="bg-gray-200 text-gray-700 px-2 rounded-full text-xs">0</span>
-    </button>
-    <button className="flex justify-between text-left hover:underline">
-      Closed Guarantees <span className="bg-gray-200 text-gray-700 px-2 rounded-full text-xs">0</span>
-    </button>
-    <button className="flex justify-between text-left hover:underline">
-      Pending Guarantees <span className="bg-gray-200 text-gray-700 px-2 rounded-full text-xs">0</span>
-    </button>
-    <button className="flex justify-between text-left hover:underline bg-blue-100 rounded px-2 py-0.5">
-      Drafts <span className="bg-gray-200 text-gray-700 px-2 rounded-full text-xs">14</span>
-    </button>
-  </>
-)}
+                <SidebarItem label="Request New Guarantee" />
+                <SidebarItem label="Active Guarantees" count={19} />
+                <SidebarItem label="Closed Guarantees" count={10} />
+                <SidebarItem label="Pending Guarantees" count={14} />
 
-            {activePanel === "arrows" && <p>Arrow panel.</p>}
+                <button className="flex justify-between items-center text-left py-2 px-2 rounded-r-md bg-blue-50 border-l-[3px] border-blue-600 text-blue-600 font-medium mt-0.5">
+                  Drafts
+                  <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                    04
+                  </span>
+                </button>
+              </>
+            )}
 
-            {activePanel === "settings" && <p>This is the Settings panel content.</p>}
+            {activePanel === "arrows" && <p className="px-2 text-gray-500">Open Banking panel.</p>}
+            {activePanel === "settings" && <p className="px-2 text-gray-500">Settings panel.</p>}
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+function SidebarItem({ label, count }) {
+  return (
+    <button className="flex justify-between items-center text-left py-2 px-2 rounded hover:bg-gray-50 text-gray-600">
+      {label}
+      {count !== undefined && (
+        <span className="bg-red-50 text-red-500 text-xs px-2 py-0.5 rounded-full font-semibold">
+          {count}
+        </span>
+      )}
+    </button>
   );
 }

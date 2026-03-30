@@ -26,6 +26,18 @@ export const formConfig = {
     { label: "Saudi Riyal (SAR)", value: "SAR" },
     { label: "US Dollar (USD)", value: "USD" },
     { label: "UAE Dirham (AED)", value: "AED" },
-    { label: "Indian Rupee (INR)", value: "INR"}
+    { label: "Indian Rupee (INR)", value: "INR" }
+  ],
+
+  country_options: [
+    { label: "Saudi Arabia", value: "SA" },
+    { label: "United Arab Emirates", value: "AE" },
+    { label: "Bahrain", value: "BH" },
+    { label: "Kuwait", value: "KW" },
+    { label: "Oman", value: "OM" },
+    { label: "Qatar", value: "QA" },
+    { label: "India", value: "IN" },
+    { label: "United States", value: "US" },
+    { label: "United Kingdom", value: "GB" }
   ]
 };

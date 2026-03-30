@@ -3,14 +3,14 @@ import * as Yup from "yup";
 export const bankGuaranteeSchema = Yup.object({
   BankAndLetterOfGuaranteeDetails: Yup.object({
     bank_name: Yup.string()
-      .min(3,"bank should be of more then two letters")
-      .matches(/^[a-zA-Z]+$/, 'numbers, and underscores are not allowed')
+      .min(3, "Must be at least 3 characters")
+      .matches(/^[a-zA-Z\s]+$/, "Only letters and spaces allowed")
       .required("Bank name is required"),
 
     branch_name: Yup.string()
-    .min(3,"bank should be of more then two letters")
-    .matches(/^[a-zA-Z]+$/, 'numbers, and underscores are not allowed')
-    .required("Branch name is required"),
+      .min(3, "Must be at least 3 characters")
+      .matches(/^[a-zA-Z\s]+$/, "Only letters and spaces allowed")
+      .required("Branch name is required"),
 
     guarantee_type: Yup.string()
       .required("Guarantee type is required"),
