@@ -17,6 +17,7 @@ export default function BankGuarantee({ formik, currentStep, setCurrentStep }) {
 
   const handleNext = async () => {
     const errors = await formik.validateForm();
+    // console.log(errors);
     formik.setTouched({
       [SECTION_KEY]: Object.fromEntries(
         Object.keys(formik.values[SECTION_KEY]).map((k) => [k, true])
